@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 @Service
-public class FilmesService{
+public class FilmesService {
 
     @Autowired
     private FilmesRepository filmesRepository;
@@ -34,7 +34,7 @@ public class FilmesService{
         return CompletableFuture.completedFuture(filmesRepository.save(filmes));
     }
 
-        public void delete(Integer id) {
+    public void delete(Integer id) {
         filmesRepository.deleteById(id);
     }
 
