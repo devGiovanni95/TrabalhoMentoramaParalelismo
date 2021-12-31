@@ -4,10 +4,13 @@ import br.com.mentorama.apiFilmes.entities.Filmes;
 import br.com.mentorama.apiFilmes.exceptions.UserNotFound;
 import br.com.mentorama.apiFilmes.services.FilmesService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 @RequestMapping("/filmes")
@@ -21,7 +24,6 @@ public class FilmesController {
     public FilmesController(FilmesService filmesService){
         this.filmesService = filmesService;
     }
-
 
     @GetMapping
     public CompletableFuture<List<Filmes>> findAll(){
@@ -49,10 +51,32 @@ public class FilmesController {
         return this.filmesService.save(filmes);
     }
 
+    @ResponseStatus(code = HttpStatus.OK)
+    @PatchMapping(value = "/{id}")
+    public CompletableFuture<Filmes> update(@RequestBody final Filmes filme, @PathVariable final int id) {
+        CompletableFuture<Optional<Filmes>> movieToBeUpdated = filmesService.findById(id);
+
+        CompletableFuture<Filmes> updateToBeUpdated = movieToBeUpdated.thenApply(movie -> {
+            if (movie.isPresent()) {
+                filme.setId(id);
+                return movie.get();
+            } else {
+                return null;
+            }
+        });
+
+        if (updateToBeUpdated.join() != null) {
+            filme.setId(id);
+            return filmesService.save(filme);
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Movie not found");
+        }
+    }
+
     @DeleteMapping("/{id}")
     public void delete(@PathVariable("id") Integer id) {
         filmesService.delete(id);
-         }
+    }
 
 
     //conferir documentação
