@@ -13,7 +13,6 @@ import java.util.concurrent.CompletableFuture;
 @Repository
 public interface FilmesRepository extends JpaRepository<Filmes, Integer> {
 
-
     CompletableFuture<Optional<Filmes>> findOneById(final Integer id);
 
     CompletableFuture<List<Filmes>> findAllBy();
